@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import ProductCard from './ProductCard'
 
 const Container = styled.div`
-    margin-top: 120px;
+    margin-top: 150px;
     width: 100vw;
     display: flex;
     justify-content: center;
@@ -14,18 +14,14 @@ const Wrapper = styled.div`
     flex-wrap: wrap;
     max-width: 1400px;
     width: 100%;
+    background: white;
 `
 
-const ProductsList = () => {
+const ProductsList = ({products, incrementBasket}) => {
   return (
     <Container>
         <Wrapper>
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
+            {products.map(product => (<ProductCard product={product} incrementBasket={incrementBasket}/>))}
         </Wrapper>
     </Container>
   )

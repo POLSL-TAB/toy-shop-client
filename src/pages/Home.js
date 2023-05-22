@@ -2,11 +2,10 @@ import React from 'react'
 import Navbar from '../components/Navbar'
 import ProductsList from '../components/ProductsList'
 
-const Home = () => {
+const Home = ({products, incrementBasket}) => {
   return (
     <div>
-        <Navbar />
-        <ProductsList />
+        <ProductsList products={products} incrementBasket={incrementBasket}/>
     </div>
   )
 }

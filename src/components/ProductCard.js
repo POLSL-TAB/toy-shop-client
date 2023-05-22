@@ -7,6 +7,8 @@ import Button from '@mui/material/Button';
 
 import logo from '../media/toy-shop-logo-no-background.png'
 
+import { Link } from 'react-router-dom';
+
 const image=false;
 
 const Container = styled.div`
@@ -19,10 +21,9 @@ const Wrapper = styled.div`
     width: 330px;
     margin: 10px;
 `
-const ImagePlaceholder = styled.a`
+const ImagePlaceholder = styled(Link)`
     width: 330px;
     height: 330px;
-    border: 1px solid gray;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -53,24 +54,28 @@ const AddToCart = styled(Button)`
     }
 `
 
-const ProductCard = ({product={id:""}}) => {
-  return (
-    <Container>
-        <Wrapper>
-            <ImagePlaceholder href={`/produkt/${product.id}`}>
-                {image?<img src={logo} />:<HideImageOutlinedIcon style={{fontSize: '100px', color: "gray"}}/>}
-            </ImagePlaceholder>
-            <Name>
-                NAZWA PRODUKTU
-            </Name>
-            <Price>
-                39.99
-            </Price>
-            <AddToCart>DODAJ DO KOSZYKA</AddToCart>
+const ProductCard = ({product, incrementBasket}) => {
 
-        </Wrapper>
-    </Container>
-  )
+    const addProduct = () => {
+        incrementBasket()
+    }
+    return (
+        <Container>
+            <Wrapper>
+                <ImagePlaceholder to={`/produkt?id=${product.productId}`}>
+                    {product.image?<img src={logo} />:<HideImageOutlinedIcon style={{fontSize: '100px', color: "gray"}}/>}
+                </ImagePlaceholder>
+                <Name>
+                    {product.name}
+                </Name>
+                <Price>
+                    {product.price}
+                </Price>
+                <AddToCart variant="contained" onClick={addProduct}>DODAJ DO KOSZYKA</AddToCart>
+
+            </Wrapper>
+        </Container>
+    )
 }
 
 export default ProductCard

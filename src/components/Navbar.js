@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom';
 import styled from 'styled-components'
 
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 import Badge from '@mui/material/Badge';
 
@@ -17,6 +19,7 @@ const Container = styled.div`
     align-items: flex-start;
     height: 110px;
     background: white;
+    z-index: 10;
 `
 const Wrapper = styled.div`
     display: flex;
@@ -70,29 +73,58 @@ const Logo = styled.div`
     background: white;
 `
 
-const MenuItem = styled.div`
+const MenuItem = styled(Link)`
+    text-decoration: none;
+    color: black;
     font-size: 24px;
     cursor: pointer;
     margin-left: 30px;
 `
+const Welcome = styled.div`
+    font-weight: bold;
+    margin: 0 20px;
+`
 
-const Navbar = () => {
+const Navbar = ({basketQuantity, filterProducts}) => {
+
+    const [user, setUser] = useState(JSON.parse(window.localStorage.getItem("user")))
+
+    const logout = () => {
+        window.localStorage.removeItem("user")
+        window.location.reload()
+    }
+    
   return (
     <Container>
         <Wrapper>
             <Left>
                 <SearchContainer>
-                    <Input />
+                    <Input onInput={(e)=>filterProducts(e.target.value)}/>
                     <SearchIcon style={{color: "gray", fontSize: "24px"}}/>
                 </SearchContainer>
             </Left>
-            <Center><Logo><img src={logo} /></Logo></Center>
+            <Center>
+                <Link to="/">
+                    <Logo><img src={logo} /></Logo>
+                </Link>
+            </Center>
             <Right>
-                <Badge badgeContent={4} color="primary">
-                    <ShoppingCartIcon color="action" />
-                </Badge>
-                <MenuItem>ZAREJESTRUJ</MenuItem>
-                <MenuItem>ZALOGUJ</MenuItem>
+                <MenuItem to="/koszyk">
+                    <Badge badgeContent={basketQuantity} color="primary">
+                        <ShoppingCartIcon />
+                    </Badge>
+                </MenuItem>
+                {
+                    user?
+                    (<>
+                        <Welcome>Witaj, {user.name}</Welcome>
+                        <LogoutIcon style={{cursor: "pointer"}} onClick={logout} />
+                    </>):
+                    (<>
+                        <MenuItem to="/rejestracja">ZAREJESTRUJ</MenuItem>
+                        <MenuItem to="/login">ZALOGUJ</MenuItem>
+                    </>)
+                }
             </Right>
         </Wrapper>
     </Container>
