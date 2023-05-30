@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { TextField, Button } from '@material-ui/core';
 
@@ -23,7 +24,7 @@ const LoginField = styled(TextField)`
 const LoginButton = styled(Button)`
 &&{
     margin-top: 20px;
-    height: 60px;
+    height: 40px;
     width: 100%;
     font-weight: bold;
     color: white;
@@ -33,9 +34,10 @@ const LoginButton = styled(Button)`
     }
 }
 `
-const Login = () => {
+const Login = ({setUser}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
@@ -47,12 +49,10 @@ const Login = () => {
 
   const login = (e) => {
     e.preventDefault();
-    // Perform login logic
-    console.log('Email:', email);
-    console.log('Password:', password);
-    window.localStorage.setItem("user", JSON.stringify({name: "Wojtek"}))
-    window.location.reload()
-  };
+      window.localStorage.setItem("user", JSON.stringify({email: email, password: password}))
+      setUser({email: email, password: password})
+      navigate(-1)
+    };
 
   return (
     <Container>

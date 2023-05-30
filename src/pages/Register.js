@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { TextField, Button } from '@material-ui/core';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 // Styled Components
 const Container = styled.div`
@@ -23,7 +25,7 @@ const RegisterField = styled(TextField)`
 const RegisterButton = styled(Button)`
 &&{
     margin-top: 20px;
-    height: 60px;
+    height: 40px;
     width: 100%;
     font-weight: bold;
     color: white;
@@ -36,6 +38,9 @@ const RegisterButton = styled(Button)`
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [open, setOpen] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const navigate = useNavigate();
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
@@ -47,16 +52,39 @@ const Register = () => {
 
   const register = (e) => {
     e.preventDefault();
-    // REJESTRUJE + dodatkowo robi to samo co login
-    
-    // Perform register logic
-    // console.log('Email:', email);
-    // console.log('Password:', password);
-    // window.localStorage.setItem("user", JSON.stringify({name: "Wojtek"}))
-    // window.location.reload()
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    var raw = JSON.stringify({
+      "email": email,
+      "password": password
+    });
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+
+    fetch(process.env.REACT_APP_API+"/api/auth/signup", requestOptions)
+      .then(response => response.text())
+      .then(result => {
+        setSuccess(true)
+        setOpen(true)
+        console.log(result)
+      })
+      .catch(error => {
+        setSuccess(false)
+        setOpen(true)
+        console.log('error', error)
+      });
   };
 
   return (
+    <>
+    <ConfirmationModal open={open} setOpen={setOpen} success={success} navigate={()=>navigate(-1)}/>
     <Container>
       <Wrapper>
         <h2>FURMULARZ REJESTRACJI</h2>
@@ -81,6 +109,7 @@ const Register = () => {
         </form>
       </Wrapper>
     </Container>
+    </>
   );
 };
 

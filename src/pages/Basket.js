@@ -1,50 +1,12 @@
 import {useEffect, useState} from 'react'
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components'
-import Navbar from '../components/Navbar'
 import ProductBasketMiniature from '../components/ProductBasketMiniature'
+import ConfirmationModal from '../components/ConfirmationModal';
 
 import Button from '@mui/material/Button';
 
 import Modal from '../components/Modal';
-
-let mockProducts = [
-    {
-        "name": "asd",
-        "productId": 1,
-        "quantity": 4,
-        "price": 29.99
-    },
-    {
-        "name": "zxc",
-        "productId": 2,
-        "quantity": 2,
-        "price": 29.99
-    },
-    {
-        "name": "qwe",
-        "productId": 3,
-        "quantity": 12,
-        "price": 29.99
-    },
-    {
-        "name": "rrr",
-        "productId": 4,
-        "quantity": 1,
-        "price": 29.99
-    },
-    {
-        "name": "hhh",
-        "productId": 5,
-        "quantity": 3,
-        "price": 29.99
-    },
-    {
-        "name": "jjj",
-        "productId": 6,
-        "quantity": 2,
-        "price": 29.99
-    }
-]
 
 const Container = styled.div`
     margin-top: 160px;
@@ -98,50 +60,167 @@ const OrderButton = styled(Button)`
     }
 `
 
-const Basket = () => {
+const Basket = ({incrementBasket, photos, user}) => {
 
-    const [open, setOpen] = useState(false)
-
-    const [products, updateProducts] = useState(mockProducts)
-
+    const [checkoutOpen, setCheckoutOpen] = useState(false)
+    const [products, setProducts] = useState([])
     const [totalPrice, setTotalPrice] = useState(0)
+    const [open, setOpen] = useState(false)
+    const [success, setSuccess] = useState(false)
+    const navigate = useNavigate()
 
     const removeProduct = (productId) => {
-        updateProducts(products.filter(elem=>elem.productId!=productId))
-        // TU POWINIEN BYĆ CALL DO API USUWAJĄCY PRODUKT Z KOSZYKA
+        setProducts(products.filter(elem=>elem.productId!=productId))
+        var myHeaders = new Headers();
+        let user = JSON.parse(window.localStorage.getItem("user"))
+        myHeaders.append("Authorization", `Basic ${btoa(`${user.email}:${user.password}`)}`)
+
+        var requestOptions = {
+        method: 'DELETE',
+        headers: myHeaders,
+        redirect: 'follow'
+        };
+
+        fetch(process.env.REACT_APP_API+"/api/cart/delete?id="+productId, requestOptions)
+        .then(response => response.text())
+        .then(result => {
+            console.log(result)
+            let productToRemove = products.filter(elem=>elem.productId==productId)[0]
+            setProducts(products.filter(elem=>elem.productId!=productId))
+            incrementBasket(-productToRemove.quantity)
+        })
+        .catch(error => console.log('error', error));
     }
 
     const incrementQuantity = productId => {
-        let obj = products.find(product => product.productId==productId)
-        let newProducts = products
-        newProducts[newProducts.indexOf(obj)] = {...obj, quantity: obj.quantity+1}
-        updateProducts([...newProducts])
-    }
+        var myHeaders = new Headers();
 
-    const decrementQuantity = productId => {
-        let obj = products.find(product => product.productId==productId)
-        let newProducts = products
-        if (obj.quantity>1) {
-            newProducts[newProducts.indexOf(obj)] = {...obj, quantity: obj.quantity-1}
-            updateProducts([...newProducts])
-        }
-        else {
-            removeProduct(productId)
-        }
+        myHeaders.append("Content-Type", "application/json");
+
+        let user = JSON.parse(window.localStorage.getItem("user"))
+        myHeaders.append("Authorization", `Basic ${btoa(`${user.email}:${user.password}`)}`)
+        
+        var raw = JSON.stringify({
+          "productId": productId,
+          "quantity": 1
+        });
+        
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: raw,
+          redirect: 'follow'
+        };
+        
+        fetch(process.env.REACT_APP_API+"/api/cart/add", requestOptions)
+          .then(response => response.text())
+          .then(result => {
+            console.log(result)
+            let obj = products.find(product => product.productId==productId)
+            let newProducts = products
+            newProducts[newProducts.indexOf(obj)] = {...obj, quantity: obj.quantity+1}
+            setProducts([...newProducts])
+            incrementBasket()
+          })
+          .catch(error => {
+            console.log('error', error)
+            setSuccess(false)
+            setOpen(true)
+          });
     }
 
     const calcTotalPrice = (products) => {
         let totalPrice = 0;
         products.forEach(product => {
-            totalPrice+= product.price*product.quantity
+            totalPrice+= parseFloat(product.price)*product.quantity
         })
         return totalPrice
     }
 
     const checkout = (e) => {
         e.preventDefault()
-        setOpen(true)
+        var myHeaders = new Headers();
+
+        let user = JSON.parse(window.localStorage.getItem("user"))
+        myHeaders.append("Authorization", `Basic ${btoa(`${user.email}:${user.password}`)}`);
+
+        var requestOptions = {
+        method: 'PUT',
+        headers: myHeaders,
+        redirect: 'follow'
+        };
+
+        fetch(process.env.REACT_APP_API+"/api/order/create", requestOptions)
+        .then(response => response.text())
+        .then(result => {  
+            setSuccess(true)
+            setOpen(true)
+        })
+        .then(incrementBasket(0))
+        .catch(error => {
+            setSuccess(false)
+            setOpen(true)
+            console.log('error', error)
+        });
     }
+
+    const getProduct = async (id) => {
+        var myHeaders = new Headers();
+
+        var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+        };
+
+        return fetch(process.env.REACT_APP_API+"/api/products/get?id="+id, requestOptions)
+        .then(response => response.text())
+        .then(result => {
+            return(result)
+        })
+        .catch(error => {
+            console.log('error', error)
+            setSuccess(false)
+            setOpen(true)
+        });
+    }
+
+    async function fetchProducts(parsedProducts) {
+        const productPromises = parsedProducts.map(product => getProduct(product.productId))
+        const gottenProducts = await Promise.all(productPromises);
+        return gottenProducts
+    }  
+
+    useEffect(() => {
+        var myHeaders = new Headers();
+        let user = JSON.parse(window.localStorage.getItem("user"))
+        myHeaders.append("Authorization", `Basic ${btoa(`${user.email}:${user.password}`)}`);
+      
+        var requestOptions = {
+          method: 'GET',
+          headers: myHeaders,
+          redirect: 'follow'
+        };
+
+        let newState = []
+
+        fetch(process.env.REACT_APP_API + "/api/cart/items", requestOptions)
+          .then(response => response.text())
+          .then(result => JSON.parse(result))
+          .then(parsedProducts => {
+            newState=parsedProducts
+            return fetchProducts(parsedProducts)
+          })
+          .then(gottenProducts => {
+            gottenProducts = gottenProducts.map((product, index)=>(product={...JSON.parse(product), ...newState[index]}))
+            setProducts(gottenProducts)
+          })
+          .catch(error => {
+            console.log('error', error)
+            setSuccess(false)
+            setOpen(true)
+          });
+      }, []);      
 
     useEffect(()=>{
         setTotalPrice(calcTotalPrice(products))
@@ -149,9 +228,10 @@ const Basket = () => {
 
     return (
         <>
+            <ConfirmationModal open={open} setOpen={setOpen} success={success} navigate={()=>navigate("/zamowienia")}/>
             <Container>
                 <ListWrapper>
-                    { products.map( product=><ProductBasketMiniature key={product.productId} product={product} incrementQuantity={incrementQuantity} decrementQuantity={decrementQuantity} /> ) }
+                    { products.map( product=><ProductBasketMiniature key={product.productId} product={product} photo={photos.find(photo=>photo["productId"]==product.productId)} incrementQuantity={incrementQuantity} removeProduct={removeProduct}/> ) }
                 </ListWrapper>
                 <Summary>
                     <Heading>PODSUMOWANIE ZAMÓWIENIA</Heading>
@@ -162,7 +242,7 @@ const Basket = () => {
                     <OrderButton variant="contained" onClick={checkout}><h3>ZAMÓW</h3></OrderButton>
                 </Summary>
             </Container>
-            <Modal open={open} setOpen={setOpen}/>
+            <Modal open={checkoutOpen} setOpen={setCheckoutOpen}/>
         </>
     )
 }

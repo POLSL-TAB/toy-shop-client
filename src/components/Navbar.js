@@ -1,14 +1,12 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import styled from 'styled-components'
-
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LogoutIcon from '@mui/icons-material/Logout';
-
 import Badge from '@mui/material/Badge';
-
 import logo from '../media/toy-shop-logo-no-background.png'
+import SimpleMenu from './SimpleMenu';
 
 const Container = styled.div`
     position: fixed;
@@ -81,17 +79,15 @@ const MenuItem = styled(Link)`
     margin-left: 30px;
 `
 const Welcome = styled.div`
-    font-weight: bold;
     margin: 0 20px;
 `
 
-const Navbar = ({basketQuantity, filterProducts}) => {
-
-    const [user, setUser] = useState(JSON.parse(window.localStorage.getItem("user")))
+const Navbar = ({basketQuantity, filterProducts, user, setUser}) => {
 
     const logout = () => {
         window.localStorage.removeItem("user")
-        window.location.reload()
+        setUser(null)
+        // window.location.reload()
     }
     
   return (
@@ -109,15 +105,17 @@ const Navbar = ({basketQuantity, filterProducts}) => {
                 </Link>
             </Center>
             <Right>
-                <MenuItem to="/koszyk">
-                    <Badge badgeContent={basketQuantity} color="primary">
-                        <ShoppingCartIcon />
-                    </Badge>
-                </MenuItem>
                 {
                     user?
                     (<>
-                        <Welcome>Witaj, {user.name}</Welcome>
+                        <MenuItem to="/koszyk">
+                            <Badge badgeContent={basketQuantity} color="primary">
+                                <ShoppingCartIcon />
+                            </Badge>
+                        </MenuItem>
+                        <Welcome>
+                            <SimpleMenu text={"Witaj, "+user.email}/>
+                        </Welcome>
                         <LogoutIcon style={{cursor: "pointer"}} onClick={logout} />
                     </>):
                     (<>

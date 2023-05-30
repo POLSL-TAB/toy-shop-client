@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import ProductCard from './ProductCard'
 
@@ -17,11 +17,12 @@ const Wrapper = styled.div`
     background: white;
 `
 
-const ProductsList = ({products, incrementBasket}) => {
+const ProductsList = ({products, photos, incrementBasket}) => {
+
   return (
     <Container>
         <Wrapper>
-            {products.map(product => (<ProductCard product={product} incrementBasket={incrementBasket}/>))}
+            {products.map(product => (<ProductCard product={product} photos={photos} incrementBasket={incrementBasket}/>))}
         </Wrapper>
     </Container>
   )

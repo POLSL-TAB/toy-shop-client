@@ -1,15 +1,10 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-
 import HideImageOutlinedIcon from '@mui/icons-material/HideImageOutlined';
-
 import Button from '@mui/material/Button';
-
 import logo from '../media/toy-shop-logo-no-background.png'
-
 import { Link } from 'react-router-dom';
-
-const image=false;
+import ConfirmationModal from './ConfirmationModal';
 
 const Container = styled.div`
     display: flex;
@@ -54,16 +49,56 @@ const AddToCart = styled(Button)`
     }
 `
 
-const ProductCard = ({product, incrementBasket}) => {
+const ProductCard = ({product, photos, incrementBasket}) => {
+
+    const [open, setOpen] = useState(false)
+    const [success, setSuccess] = useState(false)
+    const [image, setImage] = useState("")
 
     const addProduct = () => {
-        incrementBasket()
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        
+        let user = JSON.parse(window.localStorage.getItem("user"))
+        myHeaders.append("Authorization", `Basic ${btoa(`${user.email}:${user.password}`)}`);
+        
+        var raw = JSON.stringify({
+          "productId": product.id,
+          "quantity": 1
+        });
+        
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: raw,
+          redirect: 'follow'
+        };
+        
+        fetch(process.env.REACT_APP_API+"/api/cart/add", requestOptions)
+          .then(response => response.text())
+          .then(result => {
+            console.log(result)
+            incrementBasket()
+          })
+          .catch(error => {
+            console.log('error', error)
+            setSuccess(false)
+            setOpen(true)
+          });
     }
+    useEffect(()=>{
+        if (photos.find(photo=>photo["productId"]==product.id)) {
+            setImage(`data:image/jpeg;base64,${(photos.find(photo=>photo["productId"]==product.id)).pictureB64}`)
+        }
+    },[photos])
+
     return (
+        <>
+        <ConfirmationModal open={open} setOpen={setOpen} success={success} />
         <Container>
             <Wrapper>
-                <ImagePlaceholder to={`/produkt?id=${product.productId}`}>
-                    {product.image?<img src={logo} />:<HideImageOutlinedIcon style={{fontSize: '100px', color: "gray"}}/>}
+                <ImagePlaceholder to={`/produkt?id=${product.id}`}>
+                    {image?<img src={image} style={{objectFit: "contain"}}/>:<HideImageOutlinedIcon style={{fontSize: '100px', color: "gray"}}/>}
                 </ImagePlaceholder>
                 <Name>
                     {product.name}
@@ -75,6 +110,7 @@ const ProductCard = ({product, incrementBasket}) => {
 
             </Wrapper>
         </Container>
+        </>
     )
 }
 

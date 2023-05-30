@@ -5,12 +5,8 @@ import logo from '../media/toy-shop-logo-no-background.png'
 
 import HideImageOutlinedIcon from '@mui/icons-material/HideImageOutlined';
 import { IconButton, Typography } from '@mui/material';
-import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
-
-
-
-const image=false;
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 const Container = styled.div`
     display: flex;
@@ -68,14 +64,14 @@ const QuantityContainer = styled.div`
     justify-content: center;
 `
   
-const ProductBasketMiniature = ({product, incrementQuantity, decrementQuantity}) => {
+const ProductBasketMiniature = ({product, photo, incrementQuantity, removeProduct}) => {
 
     return (
         <>
             <Container>
                 <Wrapper>
                     <ImagePlaceholder>
-                        {image?<img src={logo} />:<HideImageOutlinedIcon style={{fontSize: '80px', color: "gray"}}/>}
+                        {photo.pictureB64?<img src={`data:image/jpeg;base64,${photo.pictureB64}`}  style={{objectFit: "contain"}}/>:<HideImageOutlinedIcon style={{fontSize: '80px', color: "gray", objectFit: "cover"}}/>}
                     </ImagePlaceholder>
                     <Name>
                         {product.name}
@@ -84,13 +80,6 @@ const ProductBasketMiniature = ({product, incrementQuantity, decrementQuantity})
                         {product.price}
                     </Price>
                     <QuantityContainer>
-                        <IconButton
-                            color="primary"
-                            aria-label="decrease quantity"
-                            onClick={()=>decrementQuantity(product.productId)}
-                        >
-                            <RemoveIcon />
-                        </IconButton>
                         <QuantityValue>{product.quantity}</QuantityValue>
                         <IconButton
                             color="primary"
@@ -98,6 +87,13 @@ const ProductBasketMiniature = ({product, incrementQuantity, decrementQuantity})
                             onClick={()=>incrementQuantity(product.productId)}
                         >
                             <AddIcon />
+                        </IconButton>
+                        <IconButton
+                            color="primary"
+                            aria-label="remove product"
+                            onClick={()=>removeProduct(product.productId)}
+                        >
+                            <DeleteOutlineIcon />
                         </IconButton>
                     </QuantityContainer>
                 </Wrapper>

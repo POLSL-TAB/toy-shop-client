@@ -1,13 +1,8 @@
 import React, { useState,useEffect } from 'react'
 import styled from 'styled-components'
-
 import HideImageOutlinedIcon from '@mui/icons-material/HideImageOutlined';
-
 import Button from '@mui/material/Button';
-
-import logo from '../media/toy-shop-logo-no-background.png'
-
-const image=false;
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const Container = styled.div`
     margin-top: 150px;
@@ -72,35 +67,104 @@ const Description = styled.div`
     padding-bottom: 20px;
     font-size: larger;
 `
-const ProductDetails = ({incrementBasket}) => {
+const ProductDetails = ({incrementBasket, user}) => {
 
-    const [product, setProduct] = useState({})
+    const [product, setProduct] = useState({})    
+    const [open, setOpen] = useState(false)
+    const [success, setSuccess] = useState(false)
+    const [image, setImage] = useState("")
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+        var myHeaders = new Headers();
+
+        var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+        };
+
+        fetch(process.env.REACT_APP_API+"/api/products/get?id="+productId, requestOptions)
+        .then(response => response.text())
+        .then(result => {
+            setProduct(JSON.parse(result))
+        })
+        .catch(error => {
+            console.log('error', error)
+            setSuccess(false)
+            setOpen(true)
+        });
+    }, []);
 
     useEffect(()=>{
-        //fetch product using id from url qurey
-        setProduct({
-            name: "testowy name",
-            price: 66.6,
-            description: "asd zxc"
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+        var myHeaders = new Headers();
+
+        var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+        };
+
+        fetch(process.env.REACT_APP_API+"/api/products/images?productId="+productId, requestOptions)
+        .then(response => response.text())
+        .then(result => {
+            setImage(`data:image/jpeg;base64,${JSON.parse(result)[0].pictureB64}`)
         })
+        .catch(error => console.log('error', error));
     },[])
 
     const addProduct = () => {
-        incrementBasket()
+        var myHeaders = new Headers();
+
+        myHeaders.append("Content-Type", "application/json");
+
+        myHeaders.append("Authorization", `Basic ${btoa(`${user.email}:${user.password}`)}`);
+        
+        var raw = JSON.stringify({
+          "productId": product.id,
+          "quantity": 1
+        });
+        
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: raw,
+          redirect: 'follow'
+        };
+        
+        fetch(process.env.REACT_APP_API+"/api/cart/add", requestOptions)
+          .then(response => response.text())
+          .then(result => {
+            console.log(result)
+            incrementBasket()
+          })
+          .catch(error => {
+            console.log('error', error)
+            setSuccess(false)
+            setOpen(true)
+          });
     }
 
     return (
+        <>
+        <ConfirmationModal open={open} setOpen={setOpen} success={success} />
         <Container>
             <Wrapper>
                 <ImagePlaceholder>
-                    {image?<img src={logo} />:<HideImageOutlinedIcon style={{fontSize: '100px', color: "gray"}}/>}
+                    {image?<img src={image}  style={{objectFit: "contain"}}/>:<HideImageOutlinedIcon style={{fontSize: '100px', color: "gray"}}/>}
                 </ImagePlaceholder>
                 <DescriptionWrapper>
                     <Name>
                         {product.name}
                     </Name>
                     <Price>
-                        {product.price}
+                        CENA: {product.price} zł
+                    </Price>
+                    <Price>
+                        POZOSTAŁO: {product.stock} szt.
                     </Price>
                     <Description>
                         {product.description}
@@ -109,6 +173,7 @@ const ProductDetails = ({incrementBasket}) => {
                 </DescriptionWrapper>
             </Wrapper>
         </Container>
+        </>
     )
 }
 
