@@ -10,6 +10,8 @@ import { useEffect, useState } from 'react';
 import ReturnForm from './pages/ReturnForm';
 import OrderList from './pages/OrderList';
 import ConfirmationModal from './components/ConfirmationModal';
+import Returns from './pages/Returns';
+import AddProduct from './pages/AddProduct';
 
 function App() {
 
@@ -106,12 +108,14 @@ function App() {
     <Router>
       <Routes>
         <Route path="/produkt" element={<ProductDetails incrementBasket={incrementBasket} user={user}/>} />
-        <Route path="/koszyk" element={user?(<Basket incrementBasket={incrementBasket} photos={photos} user={user}/>):<Home products={filteredProducts} photos={photos} incrementBasket={incrementBasket}/>} />
-        <Route path="/zwrot" element={user?<ReturnForm user={user}/>:<Home products={filteredProducts} photos={photos} incrementBasket={incrementBasket}/>} />
+        <Route path="/koszyk" element={user?(<Basket incrementBasket={incrementBasket} photos={photos} user={user}/>):<Home products={filteredProducts} photos={photos} incrementBasket={incrementBasket} user={user}/>} />
+        <Route path="/zwrot" element={user?<ReturnForm user={user}/>:<Home products={filteredProducts} photos={photos} incrementBasket={incrementBasket} user={user}/>} />
         <Route path="/login" element={<Login setUser={setUser}/>} />
         <Route path="/rejestracja" element={<Register />} />
-        <Route path="/zamowienia" element={user?<OrderList user={user}/>:<Home products={filteredProducts} photos={photos} incrementBasket={incrementBasket}/>} />
-        <Route path="*" element={<Home products={filteredProducts} photos={photos} incrementBasket={incrementBasket}/>} />
+        <Route path="/zamowienia" element={user?<OrderList user={user}/>:<Home products={filteredProducts} photos={photos} incrementBasket={incrementBasket} user={user}/>} />
+        <Route path="/zwroty" element={user?.email=="example@admin"?<Returns user={user}/>:<Home products={filteredProducts} photos={photos} incrementBasket={incrementBasket} user={user}/>} />
+        <Route path="/produkt/dodaj" element={user?.email=="example@admin"?<AddProduct user={user}/>:<Home products={filteredProducts} photos={photos} incrementBasket={incrementBasket} user={user}/>} />
+        <Route path="*" element={<Home products={filteredProducts} photos={photos} incrementBasket={incrementBasket} user={user}/>} />
       </Routes>
       <Navbar basketQuantity={basketQuantity} filterProducts={filterProducts} user={user} setUser={setUser}/>
     </Router>

@@ -4,7 +4,7 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import { Link } from "react-router-dom";
 
-function SimpleMenu({text}) {
+function SimpleMenu({ text, user }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   function handleClick(event) {
@@ -24,19 +24,29 @@ function SimpleMenu({text}) {
         aria-haspopup="true"
         onClick={handleClick}
         onMouseOver={handleClick}
-        style={{fontWeight:"bold"}}
+        style={{ fontWeight: "bold" }}
       >
         {text}
       </Button>
       <Menu
-      style={{marginTop: "50px"}}
+        style={{ marginTop: "50px" }}
         id="simple-menu"
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleClose}
         MenuListProps={{ onMouseLeave: handleClose }}
       >
-        <MenuItem style={{background: "white"}} onClick={handleClose}><Link to="/zamowienia" style={{textDecoration: "none", color: "black", width: "100%", height: "100%"}}>MOJE ZAMÓWIENIA</Link></MenuItem>
+        {user?.email == "example@admin" ?
+          (
+            <>
+                <MenuItem style={{ background: "white" }} onClick={handleClose}><Link to="/zwroty" style={{ textDecoration: "none", color: "black", width: "100%", height: "100%" }}>ZWROTY</Link></MenuItem>
+                <MenuItem style={{ background: "white" }} onClick={handleClose}><Link to="/produkt/dodaj" style={{ textDecoration: "none", color: "black", width: "100%", height: "100%" }}>DODAJ PRODUKT</Link></MenuItem>
+            </>
+          ):
+          (
+            <MenuItem style={{ background: "white" }} onClick={handleClose}><Link to="/zamowienia" style={{ textDecoration: "none", color: "black", width: "100%", height: "100%" }}>MOJE ZAMÓWIENIA</Link></MenuItem>
+          )
+        }
       </Menu>
     </div>
   );

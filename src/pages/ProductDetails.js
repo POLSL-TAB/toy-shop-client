@@ -154,7 +154,7 @@ const ProductDetails = ({incrementBasket, user}) => {
         <Container>
             <Wrapper>
                 <ImagePlaceholder>
-                    {image?<img src={image}  style={{objectFit: "contain"}}/>:<HideImageOutlinedIcon style={{fontSize: '100px', color: "gray"}}/>}
+                    {image?<img src={image} alt="toy" style={{objectFit: "contain"}}/>:<HideImageOutlinedIcon style={{fontSize: '100px', color: "gray"}}/>}
                 </ImagePlaceholder>
                 <DescriptionWrapper>
                     <Name>
@@ -169,7 +169,7 @@ const ProductDetails = ({incrementBasket, user}) => {
                     <Description>
                         {product.description}
                     </Description>
-                    <AddToCart onClick={addProduct} variant="contained">DODAJ DO KOSZYKA</AddToCart>
+                    <AddToCart onClick={addProduct} variant="contained" disabled={!user}>{user?"DODAJ DO KOSZYKA":"ZALOGUJ SIĘ, ŻEBY DODAĆ"}</AddToCart>
                 </DescriptionWrapper>
             </Wrapper>
         </Container>

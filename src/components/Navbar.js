@@ -54,7 +54,8 @@ const Input = styled.input`
     &:focus {
         outline: none;
     }
-    font-size: 24px;
+    font-size: 20px;
+    padding: 2px;
 `
 const Logo = styled.div`
     font-weight: bold;
@@ -95,8 +96,8 @@ const Navbar = ({basketQuantity, filterProducts, user, setUser}) => {
         <Wrapper>
             <Left>
                 <SearchContainer>
-                    <Input onInput={(e)=>filterProducts(e.target.value)}/>
-                    <SearchIcon style={{color: "gray", fontSize: "24px"}}/>
+                    <Input onInput={(e)=>filterProducts(e.target.value)} placeholder="Wyszukaj..."/>
+                    <SearchIcon style={{color: "var(--color-secondary)", fontSize: "24px"}}/>
                 </SearchContainer>
             </Left>
             <Center>
@@ -109,12 +110,12 @@ const Navbar = ({basketQuantity, filterProducts, user, setUser}) => {
                     user?
                     (<>
                         <MenuItem to="/koszyk">
-                            <Badge badgeContent={basketQuantity} color="primary">
+                            <Badge badgeContent={basketQuantity}   sx={{"& .MuiBadge-badge": {color: "white", backgroundColor: "var(--color-secondary)"} }}>
                                 <ShoppingCartIcon />
                             </Badge>
                         </MenuItem>
                         <Welcome>
-                            <SimpleMenu text={"Witaj, "+user.email}/>
+                            <SimpleMenu text={"Witaj, "+user.email} user={user}/>
                         </Welcome>
                         <LogoutIcon style={{cursor: "pointer"}} onClick={logout} />
                     </>):

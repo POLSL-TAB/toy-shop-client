@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import HideImageOutlinedIcon from '@mui/icons-material/HideImageOutlined';
 import Button from '@mui/material/Button';
-import logo from '../media/toy-shop-logo-no-background.png'
 import { Link } from 'react-router-dom';
 import ConfirmationModal from './ConfirmationModal';
 
@@ -40,6 +39,7 @@ const AddToCart = styled(Button)`
     &&{
         margin: 20px 0;
         height: 60px;
+        width: 100%;
         font-weight: bold;
         color: white;
         background: var(--color-primary);
@@ -49,7 +49,7 @@ const AddToCart = styled(Button)`
     }
 `
 
-const ProductCard = ({product, photos, incrementBasket}) => {
+const ProductCard = ({product, photos, incrementBasket, user}) => {
 
     const [open, setOpen] = useState(false)
     const [success, setSuccess] = useState(false)
@@ -59,7 +59,7 @@ const ProductCard = ({product, photos, incrementBasket}) => {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         
-        let user = JSON.parse(window.localStorage.getItem("user"))
+        // let user = JSON.parse(window.localStorage.getItem("user"))
         myHeaders.append("Authorization", `Basic ${btoa(`${user.email}:${user.password}`)}`);
         
         var raw = JSON.stringify({
@@ -87,8 +87,8 @@ const ProductCard = ({product, photos, incrementBasket}) => {
           });
     }
     useEffect(()=>{
-        if (photos.find(photo=>photo["productId"]==product.id)) {
-            setImage(`data:image/jpeg;base64,${(photos.find(photo=>photo["productId"]==product.id)).pictureB64}`)
+        if (photos.find(photo=>photo["productId"]===product.id)) {
+            setImage(`data:image/jpeg;base64,${(photos.find(photo=>photo["productId"]===product.id)).pictureB64}`)
         }
     },[photos])
 
@@ -98,7 +98,7 @@ const ProductCard = ({product, photos, incrementBasket}) => {
         <Container>
             <Wrapper>
                 <ImagePlaceholder to={`/produkt?id=${product.id}`}>
-                    {image?<img src={image} style={{objectFit: "contain"}}/>:<HideImageOutlinedIcon style={{fontSize: '100px', color: "gray"}}/>}
+                    {image?<img src={image} alt="toy" style={{objectFit: "contain"}}/>:<HideImageOutlinedIcon style={{fontSize: '100px', color: "gray"}}/>}
                 </ImagePlaceholder>
                 <Name>
                     {product.name}
@@ -106,8 +106,7 @@ const ProductCard = ({product, photos, incrementBasket}) => {
                 <Price>
                     {product.price}
                 </Price>
-                <AddToCart variant="contained" onClick={addProduct}>DODAJ DO KOSZYKA</AddToCart>
-
+                <AddToCart variant="contained" disabled={!user} onClick={addProduct}>{user?"DODAJ DO KOSZYKA":"ZALOGUJ SIĘ, ŻEBY DODAĆ"}</AddToCart>
             </Wrapper>
         </Container>
         </>

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
-import { List, ListItem, ListItemText, Button } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import styled from 'styled-components';
 import ConfirmationModal from '../components/ConfirmationModal';
+import { Table, TableBody, TableCell, TableContainer, TableRow } from '@mui/material';
 
 const Container = styled.div`
     margin-top: 150px;
@@ -20,17 +20,18 @@ const Wrapper = styled.div`
     width: 100%;
     height: 600px;
     background: white;
+    padding: 50px;
 `
-const OrderItem = styled(ListItem)`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
 
-const ReturnButton = styled(Button)`
+const StyledTableHeadRow = styled(TableRow)`
+  background-color: lightGray;
+  color: #ffffff;
+  font-weight: bold;
+`;
+const StyledButton = styled(Button)`
     &&{
-        margin: 0 20px;
         height: 40px;
+        width: 120px;
         font-weight: bold;
         color: white;
         background: var(--color-primary);
@@ -38,7 +39,24 @@ const ReturnButton = styled(Button)`
             background-color: var(--color-primary-accent);
         }
     }
-`;
+`
+
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('pl-PL', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    });
+}
+
+const getQuantity = orderItems => {
+    let sum = 0;
+    orderItems.forEach(item => sum+=item.quantity)
+    return sum
+}
 
 const OrderList = ({user}) => {
   const [orders, setOrders] = useState([]);
@@ -74,21 +92,32 @@ const OrderList = ({user}) => {
     <ConfirmationModal open={open} setOpen={setOpen} success={success} />
     <Container>
         <Wrapper>
-            <List>
-                {orders.map((order) => (
-                <OrderItem key={order.id}>
-                    <ListItemText
-                    primary={`NUMER ZAMÓWIENIA: ${order.id}`}
-                    secondary={`DATA: ${format(new Date(order.created), 'yyyy-MM-dd')}`}
-                    />
-                    <Link to={`/zwrot?id=${order.id}`} style={{ textDecoration: 'none' }}>
-                    <ReturnButton variant="contained" color="primary">
-                        ZWRÓĆ ZAMÓWIENIE
-                    </ReturnButton>
-                    </Link>
-                </OrderItem>
+            <TableContainer component="div">
+            <Table>
+                <StyledTableHeadRow>
+                <TableCell style={{ width: '150px' }}>ID ZAMÓWIENIA</TableCell>
+                <TableCell>DATA ZAMÓWIENIA</TableCell>
+                <TableCell>LICZBA ARTYKUŁÓW</TableCell>
+                <TableCell style={{width: "250px"}}>STATUS ZWROTU</TableCell>
+                <TableCell style={{ width: '150px' }}></TableCell>
+                </StyledTableHeadRow>
+                <TableBody>
+                {orders.map(elem => (
+                    <TableRow>
+                        <TableCell component="div">{elem.id}</TableCell>
+                        <TableCell component="div">{formatDate(elem.created)}</TableCell>
+                        <TableCell component="div">{getQuantity(elem.oderItems)}</TableCell>
+                        <TableCell component="div">{elem.returned?"ZWRÓCONO":"-"}</TableCell>
+                        <TableCell component="div">
+                            <StyledButton variant="contained" disabled={elem.returned}>
+                                <Link to={`/zwrot?id=${elem.id}`} style={{ textDecoration: 'none', color: "white" }}>ZWRÓĆ</Link>
+                            </StyledButton>
+                        </TableCell>
+                    </TableRow>
                 ))}
-            </List>
+                </TableBody>
+            </Table>
+        </TableContainer>
         </Wrapper>
     </Container>
     </>

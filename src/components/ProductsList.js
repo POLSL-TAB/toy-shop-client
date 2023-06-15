@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import ProductCard from './ProductCard'
 
@@ -17,12 +16,12 @@ const Wrapper = styled.div`
     background: white;
 `
 
-const ProductsList = ({products, photos, incrementBasket}) => {
+const ProductsList = ({products, photos, incrementBasket, user}) => {
 
   return (
     <Container>
         <Wrapper>
-            {products.map(product => (<ProductCard product={product} photos={photos} incrementBasket={incrementBasket}/>))}
+            {products.map(product => (<ProductCard product={product} photos={photos} incrementBasket={incrementBasket} user={user}/>))}
         </Wrapper>
     </Container>
   )
