@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/static/css/main.dfb8d742.css",
-    "main.js": "/static/js/main.8dea505e.js",
-    "static/js/703.d25db8d8.chunk.js": "/static/js/703.d25db8d8.chunk.js",
-    "static/js/513.8dc57c9e.chunk.js": "/static/js/513.8dc57c9e.chunk.js",
-    "static/media/toy-shop-logo-no-background.png": "/static/media/toy-shop-logo-no-background.b5b99a9f0699d11386e3.png",
-    "index.html": "/index.html",
-    "main.dfb8d742.css.map": "/static/css/main.dfb8d742.css.map",
-    "main.8dea505e.js.map": "/static/js/main.8dea505e.js.map",
-    "703.d25db8d8.chunk.js.map": "/static/js/703.d25db8d8.chunk.js.map",
-    "513.8dc57c9e.chunk.js.map": "/static/js/513.8dc57c9e.chunk.js.map"
+    "main.css": "/toy-shop-client/static/css/main.dfb8d742.css",
+    "main.js": "/toy-shop-client/static/js/main.ed8cb8e8.js",
+    "static/js/703.d25db8d8.chunk.js": "/toy-shop-client/static/js/703.d25db8d8.chunk.js",
+    "static/js/513.8dc57c9e.chunk.js": "/toy-shop-client/static/js/513.8dc57c9e.chunk.js",
+    "static/media/toy-shop-logo-no-background.png": "/toy-shop-client/static/media/toy-shop-logo-no-background.b5b99a9f0699d11386e3.png",
+    "index.html": "/toy-shop-client/index.html",
+    "main.dfb8d742.css.map": "/toy-shop-client/static/css/main.dfb8d742.css.map",
+    "main.ed8cb8e8.js.map": "/toy-shop-client/static/js/main.ed8cb8e8.js.map",
+    "703.d25db8d8.chunk.js.map": "/toy-shop-client/static/js/703.d25db8d8.chunk.js.map",
+    "513.8dc57c9e.chunk.js.map": "/toy-shop-client/static/js/513.8dc57c9e.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.dfb8d742.css",
-    "static/js/main.8dea505e.js"
+    "static/js/main.ed8cb8e8.js"
   ]
 }
