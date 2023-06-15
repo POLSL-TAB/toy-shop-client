@@ -2,6 +2,7 @@
   "name": "toy-shop-client",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://polsl-tab.github.io/toy-shop-client/",
   "dependencies": {
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
